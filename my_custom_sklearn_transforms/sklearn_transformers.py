@@ -18,14 +18,25 @@ class DropColumns(BaseEstimator, TransformerMixin):
  class Imputer(TransformerMixin):
 
     def __init__(self):
-       
-    def fit(self, X, y=None):
+        """Impute missing values.
 
+        Columns of dtype object are imputed with the most frequent value 
+        in column.
+
+        Columns of other types are imputed with mean of column.
+
+        """
+    def fit(self, X, y=None):
+        
         self.fill = pd.Series([X[c].value_counts().index[0]
-            if X[c].dtype == np.dtype('O') else X[c].median() for c in X],
+            if X[c].dtype == np.dtype('O') else X[c].mean() for c in X],
             index=X.columns)
 
         return self
 
     def transform(self, X, y=None):
-        return X.fillna(self.fill)
+        # Primeiro realizamos a cópia do dataframe 'X' de entrada
+        data = X.copy()
+        new_values = {'NOTA_GO':data['NOTA_GO'].median(), 'INGLES': data['INGLES'].median() }
+        # Retornamos um novo dataframe sem as colunas indesejadas
+        return data.fillna(value=new_values)
