@@ -16,6 +16,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
         return data.drop(labels=self.columns, axis='columns')
     
 class Imputer(TransformerMixin):
+
     def __init__(self):
         """Impute missing values.
 
@@ -28,7 +29,7 @@ class Imputer(TransformerMixin):
     def fit(self, X, y=None):
         
         self.fill = pd.Series([X[c].value_counts().index[0]
-            if X[c].dtype == np.dtype('O') else X[c].mean() for c in X],
+            if X[c].dtype == np.dtype('O') else X[c].median() for c in X],
             index=X.columns)
 
         return self
@@ -36,6 +37,5 @@ class Imputer(TransformerMixin):
     def transform(self, X, y=None):
         # Primeiro realizamos a cópia do dataframe 'X' de entrada
         data = X.copy()
-        new_values = {'NOTA_GO':data['NOTA_GO'].median(), 'INGLES': data['INGLES'].median() }
-        # Retornamos um novo dataframe sem as colunas indesejadas
-        return data.fillna(value=new_values)
+        # Retornamos um novo dataframe com as colunas com os nulos preenchidos
+        return data.fillna(self.fill)
