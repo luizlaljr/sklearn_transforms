@@ -31,3 +31,20 @@ class Imputer(TransformerMixin):
         new_values = {'NOTA_GO':data['NOTA_GO'].median(), 'INGLES': data['INGLES'].median() }
         # Retornamos um novo dataframe sem as colunas indesejadas
         return data.fillna(value=new_values)
+
+class Scaler(BaseEstimator, TransformerMixin):
+    def __init__(self, columns):
+        self.columns = columns
+
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        # Primeiro realizamos a cópia do dataframe 'X' de entrada
+        data = X.copy()
+        # Depois convertemos as colunas para o tipo numérico
+        data[self.columns] = data[self.columns].apply(pd.to_numeric)
+        # Em seguida aplicamos a função de normalização
+        data[self.columns] = data[self.columns].apply(minmax_scale)
+        # Retornamos o dataframe com as colunas normalizadas
+        return data
